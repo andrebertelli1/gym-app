@@ -6,9 +6,11 @@ export default function Home() {
   const session = useSession({
     required: true,
     onUnauthenticated() {
-      redirect('/signin');
+      redirect('/auth/signin');
     },
   });
+
+  console.log("session", session)
 
   return (
     <div className="p-8">

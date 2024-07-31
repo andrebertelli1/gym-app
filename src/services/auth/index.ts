@@ -2,6 +2,8 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import NextAuth, { CredentialsSignin } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { auth as authFirebase } from '@/lib/firebase'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import { prisma } from '../database'
 
 class InvalidLoginError extends CredentialsSignin {
   code = "Invalid identifier or password"
@@ -15,6 +17,7 @@ export const {
     signIn: '/auth',
     signOut: '/auth'
   },
+  adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
       credentials: {

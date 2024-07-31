@@ -17,7 +17,12 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false)
   const router = useRouter();
+
+  function openPassword() {
+    setIsPasswordOpen(true);
+  }
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault()
@@ -45,34 +50,56 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
               onChange={(e) => setEmail(e.target.value)}
               autoCorrect="off"
               disabled={isLoading}
+              className="h-[52px]"
             />
           </div>
-          <div className="grid gap-1 space-y-1">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="email">
-                Password
-              </Label>
-              <Link href="/auth/forgot-password" className="text-sm text-blue-500 hover:text-blue-600">Forgot password?</Link>
+
+          {isPasswordOpen ? (
+            <div className="flex flex-col space-y-4">
+              <div className="grid gap-1 space-y-1">
+                <Label htmlFor="password">
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoCapitalize="none"
+                  autoComplete="current-password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="h-[52px]"
+                />
+              </div>
+              <Link href="/auth/forgot-password" className="text-sm w-32 text-blue-500 hover:text-blue-600">
+                Forgot password?
+              </Link>
+              <Button
+                className="h-[52px]"
+                onClick={() => signIn('credentials', { email, password, redirect: true, callbackUrl: '/' })}
+                disabled={isLoading || !email || !password}
+              >
+                {isLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Sign In
+              </Button>
             </div>
-            <Input
-              id="password"
-              type="password"
-              autoCapitalize="none"
-              autoComplete="current-password"
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
-          <Button
-            onClick={() => signIn('credentials', { email, password, redirect: true, callbackUrl: '/' })}
-            disabled={isLoading || !email || !password}
-          >
-            {isLoading && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Sign In
-          </Button>
+          ) : (
+            <div className="flex flex-col space-y-4 items-center">
+              <Button
+                className="h-[52px] w-full"
+                onClick={openPassword}
+                disabled={isLoading || !email}
+              >
+                {isLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Continue
+              </Button>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Don&apos;t have an account?<Link className="ml-2 text-white" href="/auth/signup">Sign up</Link></p>
+            </div>
+          )}
         </div>
       </form>
       <div className="relative">
@@ -85,9 +112,7 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
           </span>
         </div>
       </div>
-      <Button onClick={() => router.push('signup')} variant="outline" type="button" disabled={isLoading}>
-        Sign up
-      </Button>
+      Login Social
     </div>
   )
 }
