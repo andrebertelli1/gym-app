@@ -6,19 +6,51 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Home, Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { EyeIcon, EyeOffIcon, Home, Loader2 } from "lucide-react"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { sendPasswordResetEmail } from "firebase/auth"
+import { auth } from "@/lib/firebase"
+import { toast } from "@/components/ui/use-toast"
 
 interface UserLoginFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false)
-  const router = useRouter();
+
+  const [loginError, setLoginError] = useState('')
+
+  const resetEmail = () => {
+    sendPasswordResetEmail(auth, email);
+
+    toast({
+      title: 'Email sent',
+      description: 'An email has been sent to your email address with a link to reset your password.'
+    })
+  };
+
+  const logIn = async (email: string, password: string) => {
+    setLoginError('');
+    try {
+      const result = await signIn('credentials', { email, password, redirect: false, callbackUrl: '/' })
+
+      if (result?.error) {
+        setLoginError(result.error);
+      } else {
+        router.push('/');
+      }
+
+    } catch (error) {
+      setLoginError('Unexpected error occurred.');
+      console.error("Erro ao cadastrar e logar:", error);
+    }
+  };
 
   function openPassword() {
     setIsPasswordOpen(true);
@@ -30,13 +62,16 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
 
     setTimeout(() => {
       setIsLoading(false)
-    }, 3000)
+    }, 1000)
   }
 
   return (
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={onSubmit}>
         <div className="grid gap-2 space-y-2">
+          {loginError != "" && (
+            <label className="text-red-700">Incorrect email or password.</label>
+          )}
           <div className="grid gap-1 space-y-1">
             <Label htmlFor="email">
               Email
@@ -60,23 +95,37 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
                 <Label htmlFor="password">
                   Password
                 </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  autoCapitalize="none"
-                  autoComplete="current-password"
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                  className="h-[52px]"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoCapitalize="none"
+                    autoComplete="current-password"
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-[52px]"
+                  />
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    size="icon"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2"
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-5 w-5 text-muted-foreground" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <span className="sr-only">Toggle password visibility</span>
+                  </Button>
+                </div>
               </div>
-              <Link href="/auth/forgot-password" className="text-sm w-32 text-blue-500 hover:text-blue-600">
-                Forgot password?
-              </Link>
+              <Button onClick={() => resetEmail()} className="w-32 cursor-pointer p-0 b-0 bg-transparent text-sm text-blue-500 hover:text-blue-600 hover:bg-transparent">Forgot password?</Button>
               <Button
                 className="h-[52px]"
-                onClick={() => signIn('credentials', { email, password, redirect: true, callbackUrl: '/' })}
+                onClick={() => logIn(email, password)}
                 disabled={isLoading || !email || !password}
               >
                 {isLoading && (

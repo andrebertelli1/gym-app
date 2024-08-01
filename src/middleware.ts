@@ -3,14 +3,23 @@ import { getUrl } from './lib/get-url'
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('authjs.session-token')
+  const onboardingCookie = request.cookies.get('onboarding')
   const pathname = request.nextUrl.pathname
 
-  if (pathname === '/auth' && token) {
-    return NextResponse.redirect(new URL(getUrl('/app')))
+  if (pathname === '/auth/onboarding' && (token && onboardingCookie)) {
+    return NextResponse.next()
   }
 
-  if (pathname.includes('/app') && !token) {
-    return NextResponse.redirect(new URL(getUrl('/auth')))
+  if (pathname.includes('/auth') && token) {
+    return NextResponse.redirect(new URL(getUrl('/')))
+  }
+
+  if (pathname === '/' && !token) {
+    return NextResponse.redirect(new URL(getUrl('/auth/signin')))
+  }
+
+  if (pathname === '/auth/onboarding' && !token && !onboardingCookie) {
+    return NextResponse.redirect(new URL(getUrl('/auth/signin')))
   }
 }
 

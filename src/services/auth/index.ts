@@ -2,11 +2,9 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import NextAuth, { CredentialsSignin } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { auth as authFirebase } from '@/lib/firebase'
-import { PrismaAdapter } from '@auth/prisma-adapter'
-import { prisma } from '../database'
 
 class InvalidLoginError extends CredentialsSignin {
-  code = "Invalid identifier or password"
+  code = "Invalid email or password"
 }
 
 export const {
@@ -17,7 +15,6 @@ export const {
     signIn: '/auth',
     signOut: '/auth'
   },
-  adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
       credentials: {
@@ -25,16 +22,36 @@ export const {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        return await signInWithEmailAndPassword(authFirebase, (credentials as any).email || '', (credentials as any).password || '')
-          .then(userCredential => {
-            if (userCredential.user) {
-              return userCredential.user
-            }
-            return null
-          })
+        try {
+          const userCredential = await signInWithEmailAndPassword(authFirebase, (credentials as any).email || '', (credentials as any).password || '');
+          if (userCredential.user) {
+            // Retorne os dados do usuário
+            return {
+              id: userCredential.user.uid,
+              email: userCredential.user.email,
+              name: userCredential.user.displayName,
+            };
+          }
+        } catch (error) {
+          console.error("Erro ao autenticar usuário:", error);
+        }
 
         throw new InvalidLoginError()
       },
     }),
   ],
+  callbacks: {
+    async session({ session, token }) {
+      // Adicione o UUID do Firebase à sessão
+      session.user.id = token.uid;
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        // Adicione o UUID do Firebase ao token JWT
+        token.uid = user.id;
+      }
+      return token;
+    },
+  },
 })

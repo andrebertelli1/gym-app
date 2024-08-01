@@ -10,8 +10,6 @@ export default function Home() {
     },
   });
 
-  console.log("session", session)
-
   return (
     <div className="p-8">
       <div className='text-white'>{session?.data?.user?.email}</div>
