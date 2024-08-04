@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(getUrl('/')))
   }
 
-  if (pathname === '/' && !token) {
+  if (pathname.includes('/app') && !token) {
     return NextResponse.redirect(new URL(getUrl('/auth/signin')))
   }
 

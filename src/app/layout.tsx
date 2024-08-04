@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-// import SessionProvider from "./session-provider";
 import { ThemeProvider } from "./_components/theme-provider";
+import SessionProvider from "./_components/session-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,9 +25,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* <SessionProvider> */}
-          {children}
-          {/* </SessionProvider> */}
+          <SessionProvider>
+            {children}
+          </SessionProvider>
         </ThemeProvider>
         <Toaster />
       </body>

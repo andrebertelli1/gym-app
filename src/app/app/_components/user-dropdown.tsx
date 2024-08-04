@@ -56,7 +56,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Settings2 className="w-3 h-3 mr-3" />
-            Configurações
+            Profile
           </DropdownMenuItem>
 
           <DropdownMenuItem>

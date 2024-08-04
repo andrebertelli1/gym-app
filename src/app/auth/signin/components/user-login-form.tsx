@@ -38,12 +38,12 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
   const logIn = async (email: string, password: string) => {
     setLoginError('');
     try {
-      const result = await signIn('credentials', { email, password, redirect: false, callbackUrl: '/' })
+      const result = await signIn('credentials', { email, password, redirect: false, callbackUrl: '/app' })
 
       if (result?.error) {
         setLoginError(result.error);
       } else {
-        router.push('/');
+        router.push('/app');
       }
 
     } catch (error) {

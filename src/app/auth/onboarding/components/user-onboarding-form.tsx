@@ -29,9 +29,9 @@ export function UserOnboardingForm({ className, ...props }: UserAuthFormProps) {
   const form = useForm<z.infer<typeof upsertOnboardingSchema>>({
     resolver: zodResolver(upsertOnboardingSchema),
     defaultValues: {
-      name: "",
-      surname: "",
-      birthDate: "",
+      first_name: "",
+      last_name: "",
+      birth_date: "",
       email: session.data?.user?.email || "",
       firebaseUid: session.data?.user?.id || "",
     },
@@ -40,14 +40,14 @@ export function UserOnboardingForm({ className, ...props }: UserAuthFormProps) {
   const onSubmit = form.handleSubmit(async (data) => {
     setIsLoading(true)
 
-    const dateObj = parseISO(data.birthDate);
+    const dateObj = parseISO(data.birth_date);
     const formattedDate = dateObj.toISOString();
 
     const onboardingData = {
-      name: data.name,
-      surname: data.surname,
+      first_name: data.first_name,
+      last_name: data.last_name,
       email: session.data?.user?.email || '',
-      birthDate: formattedDate,
+      birth_date: formattedDate,
       firebaseUid: session.data?.user?.id || '',
     }
 
@@ -73,13 +73,13 @@ export function UserOnboardingForm({ className, ...props }: UserAuthFormProps) {
             <div className="grid gap-1 space-y-1">
               <FormField
                 control={form.control}
-                name="name"
+                name="first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>First name</FormLabel>
                     <FormControl>
                       <Input
-                        id="name"
+                        id="firstName"
                         placeholder="John"
                         type="text"
                         autoCorrect="off"
@@ -97,13 +97,13 @@ export function UserOnboardingForm({ className, ...props }: UserAuthFormProps) {
               />
               <FormField
                 control={form.control}
-                name="surname"
+                name="last_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Surname</FormLabel>
+                    <FormLabel>Last name</FormLabel>
                     <FormControl>
                       <Input
-                        id="surname"
+                        id="lastName"
                         placeholder="Doe"
                         type="text"
                         autoCorrect="off"
@@ -121,7 +121,7 @@ export function UserOnboardingForm({ className, ...props }: UserAuthFormProps) {
               />
               <FormField
                 control={form.control}
-                name="birthDate"
+                name="birth_date"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Date of birth</FormLabel>

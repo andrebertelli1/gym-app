@@ -8,10 +8,10 @@ export async function upsertOnboarding(input: z.infer<typeof upsertOnboardingSch
   console.log('input: ', input)
   const user = await prisma.user.create({
     data: {
-      name: input.name,
-      surname: input.surname,
+      first_name: input.first_name,
+      last_name: input.last_name,
       email: input.email,
-      birthDate: input.birthDate,
+      birth_date: input.birth_date,
       firebaseUid: input.firebaseUid
     },
   })

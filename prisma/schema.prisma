@@ -8,14 +8,14 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  firebaseUid   String    @default(cuid())
-  name          String
-  surname       String
-  email         String?   @unique
-  emailVerified DateTime?
-  birthDate     DateTime
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  firebaseUid    String    @default(cuid())
+  first_name     String
+  last_name      String
+  email          String?   @unique
+  email_verified DateTime?
+  birth_date     DateTime
+  image          String?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
 }
